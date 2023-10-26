@@ -30,9 +30,9 @@ jobs:
       - docker/build:
          image: jaxtoh/education-space
          tag: <<pipeline.git.tag>>
-      - run:
-          name: Push Docker image to DockerHub
-          command: docker push jaxtoh/education-space:<<pipeline.git.tag>>
+      - docker/push:
+         image: jaxtoh/education-space
+         tag: <<pipeline.git.tag>>
 
   scan:
     docker:
