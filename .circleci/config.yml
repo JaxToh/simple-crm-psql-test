@@ -1,0 +1,110 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.1.4
+  snyk: snyk/snyk@1.5.0 #3rd party orb of snyk
+  heroku: circleci/heroku@2.0.0 #allows us to use heroku orbs's command
+
+jobs:
+  build:
+    docker:
+      - image: maven:3.8.2-openjdk-17
+
+    steps:
+      - checkout
+      - run: mvn clean install -DskipTests
+
+  test:
+    docker:
+      - image: maven:3.8.2-openjdk-17
+
+    steps:
+      - checkout
+      - run: mvn test
+
+  build-and-push:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/check
+      - docker/build:
+          image: limzihan/java-springboot-project-edu-space:v1.0.0
+          tag: <<pipeline.git.tag>>
+      - docker/push:
+          image: limzihan/java-springboot-project-edu-space:v1.0.0
+          tag: <<pipeline.git.tag>>
+
+  scan:
+    docker:
+      - image: cimg/openjdk:17.0.8
+    environment:
+      IMAGE_NAME: limzihan/java-springboot-project-edu-space:v1.0.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      # - echo "DOCKER_PASSWORD" | docker login -u "DOCKER_USERNAME" --password-stdin
+      # - docker/check
+      - run: docker build -t $IMAGE_NAME .
+      - snyk/scan:
+          docker-image-name: $IMAGE_NAME
+          severity-threshold: medium
+
+  deploy:
+    docker:
+      - image: maven:3.8.2-openjdk-17
+
+    steps:
+      - setup_remote_docker
+      - heroku/install
+      - checkout
+      - run:
+          name: Heroku Container Push
+          command: |
+            heroku container:login
+            heroku container:push web -a limzihan-su-devops
+            heroku container:release web -a limzihan-su-devops
+
+workflows:
+  ci-workflow:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: develop
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
+      - scan:
+          requires:
+            - build
+
+  cicd-workflow:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: release
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: release
+      - build-and-push:
+          requires:
+            - test
+          filters:
+            branches:
+              only: release
+            tags:
+              only: /^v./
+      - scan:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - build-and-push
