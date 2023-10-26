@@ -109,3 +109,5 @@ workflows:
           filters:
             branches:
               only: release
+            tags:
+              only: /^v./
