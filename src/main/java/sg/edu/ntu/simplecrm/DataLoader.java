@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import sg.edu.ntu.simplecrm.entity.Customer;
 import sg.edu.ntu.simplecrm.repository.CustomerRepository;
 
-@NoArgsConstructor
 @Component
+@NoArgsConstructor
 public class DataLoader {
 
   private CustomerRepository customerRepository;
