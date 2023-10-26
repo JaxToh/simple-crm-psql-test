@@ -28,12 +28,12 @@ jobs:
       - checkout
       - run:
         command: echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-       - docker/build:
-          image: jaxtoh/education-space
-          tag: <<pipeline.git.tag>>
-       - docker/push:
-          image: jaxtoh/education-space
-          tag: <<pipeline.git.tag>>
+      - docker/build:
+         image: jaxtoh/education-space
+         tag: <<pipeline.git.tag>>
+      - docker/push:
+         image: jaxtoh/education-space
+         tag: <<pipeline.git.tag>>
 
   scan:
     docker:
