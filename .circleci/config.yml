@@ -40,8 +40,10 @@ jobs:
     environment:
       IMAGE_NAME: jaxtoh/education-space:v1.0.0
     steps:
-      - checkout
       - setup_remote_docker
+      - checkout
+      - run:
+         command: echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin      
       - docker/check
       - run: docker build -t $IMAGE_NAME .
       - snyk/scan:
