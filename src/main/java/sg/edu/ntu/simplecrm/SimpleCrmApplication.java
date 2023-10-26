@@ -8,6 +8,9 @@ public class SimpleCrmApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SimpleCrmApplication.class, args);
+		
+		DataLoader dataLoader = new DataLoader();
+		dataLoader.loadData();
 	}
 
 }

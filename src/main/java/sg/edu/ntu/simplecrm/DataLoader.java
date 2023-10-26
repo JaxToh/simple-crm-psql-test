@@ -4,9 +4,11 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Component;
 
+import lombok.NoArgsConstructor;
 import sg.edu.ntu.simplecrm.entity.Customer;
 import sg.edu.ntu.simplecrm.repository.CustomerRepository;
 
+@NoArgsConstructor
 @Component
 public class DataLoader {
 
